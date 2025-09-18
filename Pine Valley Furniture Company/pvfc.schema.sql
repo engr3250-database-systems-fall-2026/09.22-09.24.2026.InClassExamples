@@ -1,0 +1,187 @@
+
+-- create the database
+DROP DATABASE IF EXISTS pvfc;
+CREATE DATABASE pvfc;
+
+-- select the database
+USE pvfc;
+
+-- create the tables
+CREATE TABLE Customer_T (
+    CustomerID INT AUTO_INCREMENT NOT NULL,
+    CustomerName VARCHAR(25),
+    CustomerAddress VARCHAR(30),
+    CustomerCity VARCHAR(20),
+    CustomerState VARCHAR(2),
+    CustomerPostalCode VARCHAR(9),
+	CONSTRAINT PK_Customer_T PRIMARY KEY(CustomerID)
+);
+
+CREATE TABLE Employee_T(
+	EmployeeID VARCHAR(10) NOT NULL,
+	EmployeeName VARCHAR(25) NULL,
+	EmployeeAddress VARCHAR(30) NULL,
+	EmployeeCity VARCHAR(20) NULL,
+	EmployeeState VARCHAR(2) NULL,
+	EmployeeZipCode VARCHAR(9) NULL,
+	EmployeeSupervisor VARCHAR(10) NULL,
+	EmployeeDateHired DATETIME NULL,
+	CONSTRAINT PK_Employee_T PRIMARY KEY(EmployeeID),
+	CONSTRAINT FK_Employee_T_Employee_T FOREIGN KEY (EmployeeSupervisor) REFERENCES Employee_T(EmployeeID)
+);
+
+CREATE TABLE ProductLine_T(
+	ProductLineID INT AUTO_INCREMENT NOT NULL,
+	ProductLineName VARCHAR(50) NOT NULL,
+	CONSTRAINT PK_ProductLine_T PRIMARY KEY (ProductLineID)
+ );
+ 
+ CREATE TABLE RawMaterial_T(
+	MaterialID VARCHAR(12) NOT NULL,
+	MaterialName VARCHAR(30) NULL,
+	UnitOfMeasure VARCHAR(10) NULL,
+	MaterialStandardCost DECIMAL(10,2) NULL,
+	CONSTRAINT PK_RawMaterial_T PRIMARY KEY (MaterialID) 
+);
+
+CREATE TABLE Skill_T(
+	SkillID VARCHAR(12) NOT NULL,
+	SkillDescription VARCHAR(30) NULL,
+	CONSTRAINT PK_Skill_T PRIMARY KEY (SkillID)
+);
+
+CREATE TABLE Territory_T(
+	TerritoryID INT AUTO_INCREMENT NOT NULL,
+	TerritoryName VARCHAR(50) NULL,
+	CONSTRAINT PK_Territory_T PRIMARY KEY (TerritoryID)
+);
+
+CREATE TABLE Vendor_T(
+	VendorID INT AUTO_INCREMENT NOT NULL,
+	VendorName VARCHAR(25) NULL,
+	VendorAddress VARCHAR(30) NULL,
+	VendorCity VARCHAR(20) NULL,
+	VendorState VARCHAR(2) NULL,
+	VendorZipcode VARCHAR(50) NULL,
+	CONSTRAINT PK_Vendor_T PRIMARY KEY (VendorID)
+);
+
+CREATE TABLE WorkCenter_T(
+	WorkCenterID VARCHAR(12) NOT NULL,
+	WorkCenterLocation VARCHAR(30) NULL,
+	CONSTRAINT PK_WorkCenter_T PRIMARY KEY (WorkCenterID)
+);
+
+CREATE TABLE DoesBusinessIn_T(
+	CustomerID INT NOT NULL,
+	TerritoryID INT NOT NULL,
+	CONSTRAINT PK_DoesBusinessIn_T PRIMARY KEY (CustomerID, TerritoryID),
+	CONSTRAINT FK_DoesBusinessIn_T_Customer_T FOREIGN KEY(CustomerID) REFERENCES Customer_T(CustomerID)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT FK_DoesBusinessIn_T_Territory_T FOREIGN KEY(TerritoryID) REFERENCES Territory_T(TerritoryID)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE	
+);
+
+CREATE TABLE EmployeeSkills_T(
+	EmployeeID VARCHAR(10) NOT NULL,
+	SkillID VARCHAR(12) NOT NULL,
+	CONSTRAINT PK_EmployeeSkills_T PRIMARY KEY (EmployeeID, SkillID),
+	CONSTRAINT FK_EmployeeSkills_T_Employee_T FOREIGN KEY(EmployeeID) REFERENCES Employee_T(EmployeeID)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT FK_EmployeeSkills_T_Skill_T FOREIGN KEY(SkillID) REFERENCES Skill_T(SkillID)
+		ON UPDATE CASCADE
+);
+
+CREATE TABLE Order_T (
+    OrderID SMALLINT NOT NULL,
+    OrderDate DATETIME NULL,
+    CustomerID INT NULL,
+	CONSTRAINT PK_Order_T PRIMARY KEY (OrderID),
+	CONSTRAINT FK_Order_T_Customer_T FOREIGN KEY(CustomerID) REFERENCES Customer_T(CustomerID)
+		ON UPDATE CASCADE
+);
+
+CREATE TABLE Product_T (
+    ProductID INT AUTO_INCREMENT NOT NULL,
+    ProductDescription VARCHAR(50) NULL,
+    ProductFinish VARCHAR(20) NULL,
+    ProductStandardPrice DECIMAL(10, 2) NULL,
+	ProductLineID INT NULL,
+	CONSTRAINT PK_Product_T PRIMARY KEY (ProductID),
+	CONSTRAINT FK_Product_T_ProductLine_T FOREIGN KEY(ProductLineID) REFERENCES ProductLine_T(ProductLineID)
+		ON UPDATE CASCADE
+);
+
+CREATE TABLE SALESPERSON_T(
+	SalespersonID INT AUTO_INCREMENT NOT NULL,
+	SalespersonName VARCHAR(25) NULL,
+	SalespersonPhone VARCHAR(50) NULL,
+	SalespersonFax VARCHAR(50) NULL,
+	TerritoryID INT NOT NULL,
+	CONSTRAINT PK_Salesperson_T PRIMARY KEY (SalespersonID),
+	CONSTRAINT FK_Salesperson_T_Territory_T FOREIGN KEY(TerritoryID) REFERENCES Territory_T(TerritoryID)
+		ON UPDATE CASCADE
+);
+
+CREATE TABLE Supplies_T(
+	VendorID INT NOT NULL,
+	MaterialID VARCHAR(12) NOT NULL,
+	SuppliesUnitPrice DECIMAL(10,2) NULL,
+	CONSTRAINT PK_Supplies_T PRIMARY KEY (VendorID, MaterialID),
+	CONSTRAINT FK_Supplies_T_RawMaterial_T FOREIGN KEY(MaterialID) REFERENCES RawMaterial_T(MaterialID)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT FK_Supplies_T_Vendor_T FOREIGN KEY(VendorID) REFERENCES Vendor_T(VendorID)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+);
+
+CREATE TABLE WorksIn_T(
+	EmployeeID VARCHAR(10) NOT NULL,
+	WorkCenterID VARCHAR(12) NOT NULL,
+	CONSTRAINT PK_WorksIn_T PRIMARY KEY (EmployeeID, WorkCenterID),
+	CONSTRAINT FK_WorksIn_T_Employee_T FOREIGN KEY(EmployeeID) REFERENCES Employee_T(EmployeeID)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT FK_WorksIn_T_WorkCenter_T FOREIGN KEY(WorkCenterID) REFERENCES WorkCenter_T(WorkCenterID)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+);
+
+CREATE TABLE OrderLine_T(
+	OrderID SMALLINT NOT NULL,
+	ProductID INT NOT NULL,
+	OrderedQuantity INT NULL,
+	CONSTRAINT PK_OrderLine_T PRIMARY KEY (OrderID, ProductID),
+	CONSTRAINT FK_OrderLine_T_Order_T FOREIGN KEY(OrderID) REFERENCES Order_T (OrderID)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT FK_OrderLine_T_Product_T FOREIGN KEY(ProductID) 	REFERENCES Product_T(ProductID)
+		ON UPDATE CASCADE
+);
+
+CREATE TABLE ProducedIn_T(
+	ProductID INT NOT NULL,
+	WorkCenterID VARCHAR(12) NOT NULL,
+	CONSTRAINT PK_ProducedIn_T PRIMARY KEY (ProductID, WorkCenterID),
+	CONSTRAINT FK_ProducedIn_T_Product_T FOREIGN KEY(ProductID) REFERENCES Product_T(ProductID)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT FK_ProducedIn_T_WorkCenter_T FOREIGN KEY(WorkCenterID) REFERENCES WorkCenter_T(WorkCenterID)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+);
+
+CREATE TABLE Uses_T(
+	ProductID INT NOT NULL,
+	MaterialID VARCHAR(12) NOT NULL,
+	GoesIntoQuantity SMALLINT NULL,
+	CONSTRAINT PK_Uses_T PRIMARY KEY (ProductID, MaterialID),
+	CONSTRAINT FK_Uses_T_Product_T FOREIGN KEY(ProductID) REFERENCES Product_T(ProductID)
+		ON UPDATE CASCADE,
+	CONSTRAINT FK_Uses_T_RawMaterial_T FOREIGN KEY(MaterialID) REFERENCES RawMaterial_T(MaterialID)
+		ON UPDATE CASCADE
+);
