@@ -1,17 +1,17 @@
----------------------------------------------------------
+-- -------------------------------------------------------
 -- Note: There are no insert statements for tables:
 -- RawMaterial_T
 -- Vendor_T
 -- Supplies_T
 -- ProducedIn_T
 -- Uses_T
----------------------------------------------------------
+-- -------------------------------------------------------
 
 use pvfc;
 
----------------------------------------------------------
+-- -------------------------------------------------------
 -- Group 1 Table Inserts
----------------------------------------------------------
+-- -------------------------------------------------------
 -- Table: Customer_T
 INSERT INTO Customer_T(CustomerName, CustomerAddress, CustomerCity, CustomerState, CustomerPostalCode) 
 	VALUES('Contemporary Casuals', '1355 S Hines Blvd', 'Gainesville', 'FL', '326012871');
@@ -145,9 +145,9 @@ INSERT INTO WorkCenter_T(WorkCenterID, WorkCenterLocation)
 
 
 
----------------------------------------------------------
+-- -------------------------------------------------------
 -- Group 2 Table Inserts
----------------------------------------------------------
+-- -------------------------------------------------------
 -- Table: DoesBusinessIn_T
 INSERT INTO DoesBusinessIn_T(CustomerID, TerritoryID) 
 	VALUES(1, 1);
@@ -271,9 +271,9 @@ INSERT INTO WorksIn_T(EmployeeID, WorkCenterID)
 
 
 
----------------------------------------------------------
+-- -------------------------------------------------------
 -- Group 3 Table Inserts
----------------------------------------------------------
+-- -------------------------------------------------------
 -- Table: OrderLine_T
 INSERT INTO OrderLine_T(OrderID, ProductID, OrderedQuantity) 
 	VALUES(1001, 1, 2);
